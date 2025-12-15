@@ -6,7 +6,5 @@
   <component name="ComposerSettings">
     <execution />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="Python 3.14 (projekt_vwa)" project-jdk-type="Python SDK">
-    <output url="file://$PROJECT_DIR$/out" />
-  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (projekt_vwa)" project-jdk-type="Python SDK" />
 </project>

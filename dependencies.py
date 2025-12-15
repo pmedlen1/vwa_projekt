@@ -5,6 +5,7 @@ from database.database import open_connection
 from services.items import ItemsService
 from services.auth import AuthService, User
 from services.matches import MatchesService
+from services.players import PlayersService
 from services.session import session_store, SESSION_COOKIE_NAME
 
 def get_conn() -> Iterator[sqlite3.Connection]:
@@ -19,6 +20,9 @@ def auth_service(conn: sqlite3.Connection = Depends(get_conn)) -> AuthService:
 
 def matches_service(conn: sqlite3.Connection = Depends(get_conn)) -> MatchesService:
     return MatchesService(conn)
+
+def players_service(conn: sqlite3.Connection = Depends(get_conn)) -> PlayersService:
+    return PlayersService(conn)
 
 def get_current_user(request: Request) -> Optional[User]:
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
