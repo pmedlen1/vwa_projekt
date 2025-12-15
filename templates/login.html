@@ -7,13 +7,13 @@
     <div class="page__titles">
       <span class="page__kicker">Uživatel</span>
       <h2 class="page__title">Přihlášení</h2>
-      <p class="page__subtitle">Zadejte své přihlašovací údaje.</p>
+      <p> class="page__subtitle">Zadejte své přihlašovací údaje.</p>
     </div>
   </div>
 
   <div class="card form-card">
     {% if error %}
-      <p class="error" style="margin:0;">{{ error }}</p>
+      <p> class="error" style="margin:0;">{{ error }}</p>
     {% endif %}
     <form method="post" action="{{ url_for('login_post') }}">
       <label>Uživatelské jméno

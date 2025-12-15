@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, Request, status
 from database.database import open_connection
 from services.items import ItemsService
 from services.auth import AuthService, User
+from services.matches import MatchesService
 from services.session import session_store, SESSION_COOKIE_NAME
 
 def get_conn() -> Iterator[sqlite3.Connection]:
@@ -15,6 +16,9 @@ def items_service(conn: sqlite3.Connection = Depends(get_conn)) -> ItemsService:
 
 def auth_service(conn: sqlite3.Connection = Depends(get_conn)) -> AuthService:
     return AuthService(conn)
+
+def mathces_service(conn: sqlite3.Connection = Depends(get_conn)) -> MatchesService:
+    return MatchesService(conn)
 
 def get_current_user(request: Request) -> Optional[User]:
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
@@ -30,9 +34,9 @@ def require_admin(user: User = Depends(require_user)) -> User:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
     return user
 
-def require_accountant(user: User = Depends(require_user)) -> User:
-    if user.role != "accountant":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Accountant access required")
+def require_coach(user: User = Depends(require_user)) -> User:
+    if user.role != "coach":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Coach access required")
     return user
 
 
