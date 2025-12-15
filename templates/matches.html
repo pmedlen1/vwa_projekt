@@ -52,7 +52,7 @@
         <tbody>
         {% for m in matches %}
           <tr>
-              <td>{{ m.date }}</td>
+              <td>{{ m.date.replace("T", " ") }}</td>
               <td><strong>vs {{ m.opponent }}</strong></td>
               <td>{{ m.location }}</td>
               <td>

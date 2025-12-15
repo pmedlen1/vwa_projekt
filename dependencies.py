@@ -34,6 +34,11 @@ def require_admin(user: User = Depends(require_user)) -> User:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
     return user
 
+def require_admin_or_coach(user: User = Depends(require_user)) -> User:
+    if user.role not in ("admin", "coach"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin or Coach access required")
+    return user
+
 def require_coach(user: User = Depends(require_user)) -> User:
     if user.role != "coach":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Coach access required")

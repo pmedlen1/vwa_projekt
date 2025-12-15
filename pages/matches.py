@@ -4,7 +4,7 @@ from fastapi.responses import RedirectResponse
 from starlette import status
 from services.matches import MatchesService
 from services.auth import User
-from dependencies import matches_service, get_current_user, require_admin
+from dependencies import matches_service, get_current_user, require_admin, require_admin_or_coach
 
 router = APIRouter()
 
@@ -33,7 +33,7 @@ async def create_match_post(
     location: str = Form(...),
     date: str = Form(...), # Príde ako string z HTML <input type="datetime-local">
     svc: MatchesService = Depends(matches_service),
-    user: User = Depends(require_admin), # Len admin (a tréner) môže pridať zápas
+    user: User = Depends(require_admin_or_coach), # Len admin (a tréner) môže pridať zápas
 ):
     # Vytvoríme zápas
     svc.create_match(date=date, opponent=opponent, location=location)
@@ -46,7 +46,7 @@ async def delete_match_post(
     request: Request,
     match_id: int,
     svc: MatchesService = Depends(matches_service),
-    user: User = Depends(require_admin),
+    user: User = Depends(require_admin_or_coach),
 ):
     svc.remove_match(match_id)
     return RedirectResponse(url=request.url_for("matches_ui"), status_code=status.HTTP_303_SEE_OTHER)

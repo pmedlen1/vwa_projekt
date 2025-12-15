@@ -21,7 +21,7 @@
     {% set active_endpoint = request.scope['endpoint'].__name__ %}
     <nav class="top-nav">
                 <div class="nav-links">
-            <a>
+            <a
               class="nav-link{% if active_endpoint == 'dashboard_ui' %} is-active{% endif %}"
               href="{{ url_for('dashboard_ui') }}"
               title="Dashboard"
@@ -31,12 +31,12 @@
             </a>
 
             <!-- ZMENA: Odkaz na Zápasy -->
-            <a>
+            <a
               class="nav-link{% if 'matches' in active_endpoint %} is-active{% endif %}"
               href="{{ url_for('matches_ui') }}"
               title="Zápasy"
               aria-label="Zápasy"
-              {% if 'matches' in active_endpoint %}aria-current="page"{% endif %}>
+              {% if'matches' in active_endpoint %}aria-current="page"{% endif %}>
                 <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
             </a>
         </div>
