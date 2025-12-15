@@ -17,7 +17,7 @@ def items_service(conn: sqlite3.Connection = Depends(get_conn)) -> ItemsService:
 def auth_service(conn: sqlite3.Connection = Depends(get_conn)) -> AuthService:
     return AuthService(conn)
 
-def mathces_service(conn: sqlite3.Connection = Depends(get_conn)) -> MatchesService:
+def matches_service(conn: sqlite3.Connection = Depends(get_conn)) -> MatchesService:
     return MatchesService(conn)
 
 def get_current_user(request: Request) -> Optional[User]:

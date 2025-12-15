@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Zápasy{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+      <span class="page__kicker">Sezóna 2023/2024</span>
+      <h2 class="page__title">Zápasy</h2>
+      <p class="page__subtitle">Plán a výsledky zápasov tímu.</p>
+    </div>
+  </div>
+
+  <!-- Formulár pre pridanie zápasu (Len pre Admina/Trénera) -->
+  {% if user and (user.role == 'admin' or user.role == 'coach') %}
+  <div class="card form-card stack-md" style="margin-bottom: 2rem;">
+      <h3>Naplánovať nový zápas</h3>
+      <form method="post" action="{{ url_for('create_match_post') }}" style="flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 1rem;">
+          <label>
+              Súper
+              <input type="text" name="opponent" placeholder="FC Barcelona" required>
+          </label>
+          <label>
+              Miesto
+              <input type="text" name="location" placeholder="Domov / Vonku" required>
+          </label>
+          <label>
+              Dátum a čas
+              <input type="datetime-local" name="date" required>
+          </label>
+          <button type="submit" class="button">Pridať zápas</button>
+      </form>
+  </div>
+  {% endif %}
+
+  <!-- Zoznam zápasov -->
+  <div class="card table-card stack-md">
+    <h3 style="margin:0;">Rozpis zápasov</h3>
+    {% if matches|length == 0 %}
+      <p style="margin:0; color: var(--muted);">Zatiaľ nie sú naplánované žiadne zápasy.</p>
+    {% else %}
+      <table class="data">
+        <thead>
+            <tr>
+                <th>Dátum</th>
+                <th>Súper</th>
+                <th>Miesto</th>
+                <th>Výsledok</th>
+                {% if user and user.role == 'admin' %}<th>Akcie</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for m in matches %}
+          <tr>
+              <td>{{ m.date }}</td>
+              <td><strong>vs {{ m.opponent }}</strong></td>
+              <td>{{ m.location }}</td>
+              <td>
+                  {% if m.home_score is defined and m.away_score is defined %}
+                    <span style="font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px;">
+                        {{ m.home_score }}:{{ m.away_score }}
+                    </span>
+                  {% else %}
+                    -:-
+                  {% endif %}
+              </td>
+              {% if user and user.role == 'admin' %}
+              <td>
+                  <form method="post" action="{{ url_for('delete_match_post', match_id=m.id) }}" onsubmit="return confirm('Naozaj vymazať tento zápas?');">
+                      <button type="submit" style="padding: 0.3rem 0.8rem; background: #ea5d61; font-size: 0.7rem; border:none; color:white; border-radius:4px; cursor:pointer;">Zmazať</button>
+                  </form>
+              </td>
+              {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

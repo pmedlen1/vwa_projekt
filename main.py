@@ -3,21 +3,24 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-from pages.items import router as items_router  # ← DŮLEŽITÉ: přímý import modulu
+# from pages.items import router as items_router  # ← DŮLEŽITÉ: přímý import modulu
+from pages.matches import router as match_router
 from pages.dashboard import router as dashboard_router  # ← DŮLEŽITÉ: přímý import modulu
 from pages.auth import router as auth_router
-from dependencies import items_service, auth_service, get_current_user
+from dependencies import auth_service, get_current_user, matches_service
 from services.items import ItemsService
 from services.auth import AuthService
+from services.matches import MatchesService
+
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Mini FastAPI – Items")
+    app = FastAPI(title="Futbalový Manažer", version="1.0.0")
 
     app.mount("/static", StaticFiles(directory="static"), name="static")
     app.state.templates = Jinja2Templates(directory="templates")
 
     app.include_router(dashboard_router, prefix="", tags=["homepage"])
-    app.include_router(items_router, prefix="/items", tags=["items"])
+    app.include_router(match_router, prefix="/matches", tags=["mathces"])
     app.include_router(auth_router, prefix="", tags=["auth"])
 
 
@@ -30,7 +33,7 @@ def create_app() -> FastAPI:
             pass
 
     # Pokud používáš override přes třídu, nech, jinak ho klidně vyhoď
-    app.dependency_overrides[ItemsService] = items_service
+    app.dependency_overrides[MatchesService] = matches_service
     app.dependency_overrides[AuthService] = auth_service
 
     app.add_middleware(SessionMiddleware, secret_key="dev-secret")

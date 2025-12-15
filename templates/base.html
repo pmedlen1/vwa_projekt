@@ -20,7 +20,7 @@
     {% set current_user = get_user(request) %}
     {% set active_endpoint = request.scope['endpoint'].__name__ %}
     <nav class="top-nav">
-        <div class="nav-links">
+                <div class="nav-links">
             <a>
               class="nav-link{% if active_endpoint == 'dashboard_ui' %} is-active{% endif %}"
               href="{{ url_for('dashboard_ui') }}"
@@ -29,13 +29,15 @@
               {% if active_endpoint == 'dashboard_ui' %}aria-current="page"{% endif %}>
                 <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
             </a>
+
+            <!-- ZMENA: Odkaz na Zápasy -->
             <a>
-              class="nav-link{% if active_endpoint == 'items_ui' %} is-active{% endif %}"
-              href="{{ url_for('items_ui') }}"
-              title="Položky"
-              aria-label="Položky"
-              {% if active_endpoint == 'items_ui' %}aria-current="page"{% endif %}>
-                <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+              class="nav-link{% if 'matches' in active_endpoint %} is-active{% endif %}"
+              href="{{ url_for('matches_ui') }}"
+              title="Zápasy"
+              aria-label="Zápasy"
+              {% if 'matches' in active_endpoint %}aria-current="page"{% endif %}>
+                <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
             </a>
         </div>
 
