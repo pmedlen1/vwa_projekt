@@ -46,7 +46,7 @@
                 <th>Súper</th>
                 <th>Miesto</th>
                 <th>Výsledok</th>
-                {% if user and user.role == 'admin' %}<th>Akcie</th>{% endif %}
+                {% if user and user.role == 'admin' or 'coach' %}<th>Akcie</th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -64,7 +64,7 @@
                     -:-
                   {% endif %}
               </td>
-              {% if user and user.role == 'admin' %}
+              {% if user and user.role == 'admin' or 'coach' %}
               <td>
                   <form method="post" action="{{ url_for('delete_match_post', match_id=m.id) }}" onsubmit="return confirm('Naozaj vymazať tento zápas?');">
                       <button type="submit" style="padding: 0.3rem 0.8rem; background: #ea5d61; font-size: 0.7rem; border:none; color:white; border-radius:4px; cursor:pointer;">Zmazať</button>
