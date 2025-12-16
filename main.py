@@ -7,10 +7,12 @@ from starlette.middleware.sessions import SessionMiddleware
 from pages.matches import router as match_router
 from pages.dashboard import router as dashboard_router  # ← DŮLEŽITÉ: přímý import modulu
 from pages.auth import router as auth_router
-from dependencies import auth_service, get_current_user, matches_service
+from dependencies import auth_service, get_current_user, matches_service, players_service
 from services.items import ItemsService
 from services.auth import AuthService
 from services.matches import MatchesService
+from pages.players import router as players_router
+from services.players import PlayersService
 
 
 def create_app() -> FastAPI:
@@ -22,6 +24,7 @@ def create_app() -> FastAPI:
     app.include_router(dashboard_router, prefix="", tags=["homepage"])
     app.include_router(match_router, prefix="/matches", tags=["mathces"])
     app.include_router(auth_router, prefix="", tags=["auth"])
+    app.include_router(players_router, prefix="/players", tags=["players"])
 
 
     # DEBUG: vypiš zaregistrované cesty
@@ -35,6 +38,8 @@ def create_app() -> FastAPI:
     # Pokud používáš override přes třídu, nech, jinak ho klidně vyhoď
     app.dependency_overrides[MatchesService] = matches_service
     app.dependency_overrides[AuthService] = auth_service
+    app.dependency_overrides[PlayersService] = players_service
+
 
     app.add_middleware(SessionMiddleware, secret_key="dev-secret")
 
