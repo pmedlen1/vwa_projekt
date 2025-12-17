@@ -39,6 +39,11 @@
               {% if'matches' in active_endpoint %}aria-current="page"{% endif %}>
                 <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
             </a>
+
+             <a class="nav-link {% if 'players' in active_endpoint %}is-active{% endif %}"
+                href="{{ url_for('players_ui') }}" ...>
+                <span class="material-symbols-outlined">group</span>
+             </a>
         </div>
 
         <div class="nav-footer">

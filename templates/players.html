@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Hráči{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+      <span class="page__kicker">Tím A</span>
+      <h2 class="page__title">Hráči</h2>
+      <p class="page__subtitle">Súpiska tímu.</p>
+    </div>
+    
+    {% if user and (user.role == 'admin' or user.role == 'coach') %}
+    <div class="page__actions">
+        <a href="{{ url_for('create_player_ui') }}" class="button">Pridať hráča</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="card table-card stack-md">
+    {% if players|length == 0 %}
+      <p style="margin:0; padding: 1rem; color: var(--muted);">Zatiaľ nie sú v tíme žiadni hráči.</p>
+    {% else %}
+      <table class="data">
+        <thead>
+            <tr>
+                <th>Meno</th>
+                <th>Pozícia</th>
+                <th>Dátum nar.</th>
+                {% if user and (user.role == 'admin' or user.role == 'coach') %}<th>Akcie</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in players %}
+          <tr>
+              <td>
+                  <strong>{{ p.first_name }} {{ p.last_name }}</strong><br>
+                  <span style="font-size: 0.8em; color: var(--muted);">@{{ p.username }}</span>
+              </td>
+              <td>{{ p.position }}</td>
+              <td>{{ p.birth_date }}</td>
+              
+              {% if user and (user.role == 'admin' or user.role == 'coach') %}
+              <td>
+                  <div style="display:flex; gap:0.5rem;">
+                      <a href="{{ url_for('edit_player_ui', player_id=p.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">Upraviť</a>
+                      
+                      <form method="post" action="{{ url_for('delete_player_post', player_id=p.id) }}" onsubmit="return confirm('Naozaj vymazať hráča {{ p.first_name }} {{ p.last_name }}?');" style="margin:0;">
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">Zmazať</button>
+                      </form>
+                  </div>
+              </td>
+              {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{% if player %}Upraviť hráča{% else %}Nový hráč{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('players_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam</a>
+        <h2 class="page__title">{% if player %}Upraviť hráča{% else %}Nový hráč{% endif %}</h2>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <form method="post" action="{% if player %}{{ url_for('edit_player_post', player_id=player.id) }}{% else %}{{ url_for('create_player_post') }}{% endif %}">
+      
+      <!-- Username zadávame len pri vytváraní -->
+      {% if not player %}
+      <label>
+        Prihlasovacie meno (Username)
+        <input type="text" name="username" required placeholder="jmrkvicka">
+      </label>
+      {% else %}
+      <div style="margin-bottom: 1rem;">
+          <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent-dark);">Prihlasovacie meno</span>
+          <div style="padding: 0.65rem 0.85rem; background: #f5f5f5; border-radius: 0.75rem; margin-top: 0.35rem;">{{ player.username }}</div>
+      </div>
+      {% endif %}
+
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <label style="flex:1;">
+            Meno
+            <input type="text" name="first_name" value="{{ player.first_name if player else '' }}" required placeholder="Janko">
+          </label>
+          <label style="flex:1;">
+            Priezvisko
+            <input type="text" name="last_name" value="{{ player.last_name if player else '' }}" required placeholder="Mrkvička">
+          </label>
+      </div>
+      
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <label style="flex:1;">
+            Pozícia
+            <input type="text" name="position" value="{{ player.position if player else '' }}" placeholder="Útočník">
+          </label>
+          <label style="flex:1;">
+            Dátum narodenia
+            <input type="date" name="birth_date" value="{{ player.birth_date if player else '' }}">
+          </label>
+      </div>
+
+      <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+          <button type="submit" class="button">Uložiť</button>
+          <a href="{{ url_for('players_ui') }}" class="button" style="background: var(--muted);">Zrušiť</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
