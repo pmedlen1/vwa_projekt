@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Účasť - {{ player.last_name }}{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('players_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam hráčov</a>
+        <h2 class="page__title">{{ player.first_name }} {{ player.last_name }}</h2>
+        <p class="page__subtitle">Evidencia dochádzky</p>
+    </div>
+  </div>
+
+  <div class="card table-card stack-md">
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Dátum</th>
+                <th>Udalosť</th>
+                <th>Potvrdenie hráča</th>
+                <th>Prítomnosť (Tréner)</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for e in events %}
+          <tr>
+              <td>{{ e.date|replace("T", " ") }}</td>
+              <td>
+                  {% if e.type == 'match' %}
+                    <span class="material-symbols-outlined" style="vertical-align:middle; font-size:1.2em;">sports_soccer</span>
+                  {% else %}
+                    <span class="material-symbols-outlined" style="vertical-align:middle; font-size:1.2em;">fitness_center</span>
+                  {% endif %}
+                  {{ e.title }}
+              </td>
+              <td>
+                  {% if e.confirmed %}
+                    <span style="color: green;">✓ Potvrdil</span>
+                  {% else %}
+                    <span style="color: gray;">? Čaká sa</span>
+                  {% endif %}
+              </td>
+              <td>
+                  <form method="post" action="{{ url_for('toggle_presence_post', player_id=player.id, event_type=e.type, event_id=e.event_id) }}">
+                      {% if e.present %}
+                        <button type="submit" name="present" value="0" style="background: #d1fae5; color: #065f46; border:1px solid #a7f3d0; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">
+                            ✓ Prítomný
+                        </button>
+                      {% else %}
+                        <button type="submit" name="present" value="1" style="background: #fee2e2; color: #991b1b; border:1px solid #fecaca; padding: 0.2rem 0.6rem; border-radius: 4px; cursor: pointer;">
+                            ✗ Neprítomný
+                        </button>
+                      {% endif %}
+                  </form>
+              </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

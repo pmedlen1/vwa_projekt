@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 from passlib.context import CryptContext
 from repositories.players import (list_players as repo_list_players, get_player as repo_get_player,
                                   insert_player as repo_insert_player, update_player as repo_update_player,
-                                  delete_player as repo_delete_player)
+                                  delete_player as repo_delete_player, get_player_events as repo_get_player_events, set_player_presence as repo_set_player_presence)
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -28,3 +28,9 @@ class PlayersService:
 
     def delete_player(self, player_id: int):
         repo_delete_player(self.conn, player_id)
+
+    def get_events_for_player(self, player_id: int) -> List[Dict[str, Any]]:
+        return repo_get_player_events(self.conn, player_id)
+
+    def confirm_presence(self, player_id: int, event_type: str, event_id: int, present: bool):
+        repo_set_player_presence(self.conn, player_id, event_type, event_id, present)

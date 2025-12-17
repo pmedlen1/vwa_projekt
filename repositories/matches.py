@@ -99,3 +99,40 @@ def set_attendance(conn: sqlite3.Connection, user_id: int, match_id: int, confir
             (user_id, match_id, confirmed)
         )
     conn.commit()
+
+def get_match_attendees(conn: sqlite3.Connection, match_id: int) -> List[Dict[str, Any]]:
+    """Vráti zoznam hráčov, ktorí potvrdili účasť na zápase."""
+    rows = conn.execute(
+        """
+        SELECT u.id, u.first_name, u.last_name, u.position, a.confirmed
+        FROM users u
+        LEFT JOIN attendance a ON u.id = a.user_id AND a.match_id = ?
+        WHERE u.role = 'player'
+        ORDER BY u.last_name
+        """,
+        (match_id,)
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+#        HODNOTENIA
+
+def get_evaluation(conn: sqlite3.Connection, match_id: int, player_id: int) -> Optional[Dict[str, Any]]:
+    row = conn.execute(
+        "SELECT * FROM evaluations WHERE match_id = ? AND player_id = ?",
+        (match_id, player_id)
+    ).fetchone()
+    return dict(row) if row else None
+
+def set_evaluation(conn: sqlite3.Connection, match_id: int, player_id: int, coach_id: int, rating: float, comment: str) -> None:
+    existing = get_evaluation(conn, match_id, player_id)
+    if existing:
+        conn.execute(
+            "UPDATE evaluations SET rating = ?, comment = ?, coach_id = ? WHERE id = ?",
+            (rating, comment, coach_id, existing['id'])
+        )
+    else:
+        conn.execute(
+            "INSERT INTO evaluations(match_id, player_id, coach_id, rating, comment) VALUES (?, ?, ?, ?, ?)",
+            (match_id, player_id, coach_id, rating, comment)
+        )
+    conn.commit()

@@ -3,7 +3,8 @@ from typing import List, Dict, Any
 # Importujeme funkcie, ktoré sme práve vytvorili
 from repositories.matches import (list_matches as repo_list_matches, insert_match as repo_insert_match, delete_match as repo_delete_match,
                                   update_score as repo_update_score, get_attendance as repo_get_attendance, set_attendance as repo_set_attendance,
-                                  get_match as repo_get_match, update_match as repo_update_match,)
+                                  get_match as repo_get_match, update_match as repo_update_match, get_evaluation as repo_get_evaluation,
+                                  set_evaluation as repo_set_evaluation, get_match_attendees as repo_get_match_attendees,)
 
 class MatchesService:
     def __init__(self, conn: sqlite3.Connection):
@@ -36,3 +37,15 @@ class MatchesService:
 
     def confirm_attendance(self, user_id: int, match_id: int, confirmed: bool = True):
         repo_set_attendance(self.conn, user_id, match_id, confirmed)
+
+    def get_match_participants(self, match_id: int) -> List[Dict[str, Any]]:
+        """Vráti zoznam hráčov a ich stav účasti + hodnotenie ak existuje."""
+        players = repo_get_match_attendees(self.conn, match_id)
+        # Obohatíme o existujúce hodnotenia
+        for p in players:
+            evaluation = repo_get_evaluation(self.conn, match_id, p['id'])
+            p['evaluation'] = evaluation
+        return players
+
+    def save_evaluation(self, match_id: int, player_id: int, coach_id: int, rating: float, comment: str):
+        repo_set_evaluation(self.conn, match_id, player_id, coach_id, rating, comment)

@@ -31,7 +31,7 @@ async def matches_ui(
         "matches.html",
         {
             "request": request,
-            "matches": matches,
+            "matches": matches_with_attendance,
             "user": user
         },
     )
@@ -110,3 +110,45 @@ async def toggle_attendance_post(
     svc.confirm_attendance(user.id, match_id, not current_status)
 
     return RedirectResponse(url=request.url_for("matches_ui"), status_code=status.HTTP_303_SEE_OTHER)
+
+# Endpoint pre správu zápasu (Detail pre Trénera)
+@router.get("/{match_id}/manage", name="manage_match_ui")
+async def manage_match_ui(
+    request: Request,
+    match_id: int,
+    svc: MatchesService = Depends(matches_service),
+    user: User = Depends(require_admin_or_coach),
+):
+    match = svc.get_match(match_id)
+    if not match:
+        return RedirectResponse(url=request.url_for("matches_ui"))
+
+    participants = svc.get_match_participants(match_id)
+
+    return request.app.state.templates.TemplateResponse(
+        "manage_match.html",
+        {
+            "request": request,
+            "match": match,
+            "participants": participants,
+            "user": user
+        }
+    )
+
+# Endpoint pre hodnotenie hráča
+@router.post("/{match_id}/evaluate/{player_id}", name="evaluate_player_post")
+async def evaluate_player_post(
+    request: Request,
+    match_id: int,
+    player_id: int,
+    rating: float = Form(...),
+    comment: str = Form(""),
+    svc: MatchesService = Depends(matches_service),
+    user: User = Depends(require_admin_or_coach),
+):
+    svc.save_evaluation(match_id, player_id, user.id, rating, comment)
+    # Presmerujeme späť na stránku správy zápasu
+    return RedirectResponse(
+        url=request.url_for("manage_match_ui", match_id=match_id),
+        status_code=status.HTTP_303_SEE_OTHER
+    )

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Hodnotenie Zápasu{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('matches_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam</a>
+        <h2 class="page__title">Hodnotenie zápasu</h2>
+        <p class="page__subtitle">{{ match.opponent }} ({{ match.date|replace("T", " ") }})</p>
+    </div>
+  </div>
+
+  <div class="card table-card stack-md">
+    <h3 style="margin:0;">Súpiska a Hodnotenie</h3>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Hráč</th>
+                <th>Pozícia</th>
+                <th>Účasť</th>
+                <th>Hodnotenie (0-10)</th>
+                <th>Komentár</th>
+                <th>Akcia</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in participants %}
+          <tr>
+              <td><strong>{{ p.first_name }} {{ p.last_name }}</strong></td>
+              <td>{{ p.position }}</td>
+              <td>
+                  {% if p.confirmed %}
+                    <span style="color: #059669; font-weight:bold;">✓ Áno</span>
+                  {% else %}
+                    <span style="color: #9ca3af;">- Nie</span>
+                  {% endif %}
+              </td>
+              
+              <!-- Formulár pre hodnotenie -->
+              <form method="post" action="{{ url_for('evaluate_player_post', match_id=match.id, player_id=p.id) }}">
+                  <td>
+                      <input type="number" name="rating" min="0" max="10" step="0.5" 
+                             value="{{ p.evaluation.rating if p.evaluation else '' }}" 
+                             style="width: 70px; padding: 5px;" required>
+                  </td>
+                  <td>
+                      <input type="text" name="comment" 
+                             value="{{ p.evaluation.comment if p.evaluation else '' }}" 
+                             placeholder="Dobrý výkon..." style="width: 100%; padding: 5px;">
+                  </td>
+                  <td>
+                      <button type="submit" class="button" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">Uložiť</button>
+                  </td>
+              </form>
+          </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

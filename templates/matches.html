@@ -55,7 +55,7 @@
         {% for m in matches %}
           <tr>
               <td>{{ m.date.replace("T", " ") }}</td>
-              <td><strong>vs {{ m.opponent }}</strong></td>
+              <td><strong>{{ m.opponent }}</strong></td>
               <td>{{ m.location }}</td>
               <td>
                   {% if m.home_score is not none and m.away_score is not none %}
@@ -66,6 +66,7 @@
                     <span style="color: #999;">-:-</span>
                   {% endif %}
               </td>
+
               {% if user and user.role == 'player' %}
               <td>
                   <form method="post" action="{{ url_for('toggle_attendance_post', match_id=m.id) }}">
@@ -81,13 +82,23 @@
                   </form>
               </td>
               {% endif %}
+
               {% if user and (user.role == 'admin' or user.role == 'coach') %}
               <td>
                   <div style="display:flex; gap:0.5rem;">
-                      <a href="{{ url_for('edit_match_ui', match_id=m.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">Upraviť</a>
+                      <a href="{{ url_for('manage_match_ui', match_id=m.id) }}"
+                         style="padding: 0.3rem 0.8rem; background: #f3e8ff; color: #6b21a8; text-decoration:none; font-size: 0.7rem; border-radius:4px;">
+                          Hodnotiť
+                      </a>
+                      <a href="{{ url_for('edit_match_ui', match_id=m.id) }}"
+                         style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">
+                          Upraviť
+                      </a>
 
                       <form method="post" action="{{ url_for('delete_match_post', match_id=m.id) }}" onsubmit="return confirm('Naozaj vymazať tento zápas?');" style="margin:0;">
-                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">Zmazať</button>
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">
+                              Zmazať
+                          </button>
                       </form>
                   </div>
               </td>

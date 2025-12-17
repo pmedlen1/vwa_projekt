@@ -55,3 +55,64 @@ def delete_player(conn: sqlite3.Connection, player_id: int) -> None:
     conn.execute("DELETE FROM users WHERE id = ?", (player_id,))
     conn.commit()
 
+# Získanie všetkých udalostí (zápasy + tréningy) pre hráča
+def get_player_events(conn: sqlite3.Connection, player_id: int) -> List[Dict[str, Any]]:
+    #   Zápasy
+    matches = conn.execute(
+        """
+        SELECT 
+            'match' as type, 
+            m.id as event_id, 
+            m.date, 
+            'Zápas: ' || m.opponent as title, 
+            a.confirmed, 
+            a.present 
+        FROM matches m
+        LEFT JOIN attendance a ON m.id = a.match_id AND a.user_id = ?
+        ORDER BY m.date DESC
+        """,
+        (player_id,)
+    ).fetchall()
+
+    # Tréningy
+    trainings = conn.execute(
+        """
+        SELECT 
+            'training' as type, 
+            t.id as event_id, 
+            t.date, 
+            'Tréning: ' || t.location as title, 
+            a.confirmed, 
+            a.present 
+        FROM trainings t
+        LEFT JOIN attendance a ON t.id = a.training_id AND a.user_id = ?
+        ORDER BY t.date DESC
+        """,
+        (player_id,)
+    ).fetchall()
+
+    # Spojíme a zoradíme podľa dátumu
+    all_events = [dict(r) for r in matches] + [dict(r) for r in trainings]
+    all_events.sort(key=lambda x: x['date'], reverse=True)
+
+    return all_events
+
+#  Nastavenie prítomnosti (present) - potvrdzuje tréner
+def set_player_presence(conn: sqlite3.Connection, user_id: int, event_type: str, event_id: int, present: bool) -> None:
+    # Zistíme, či záznam v attendance existuje
+    if event_type == 'match':
+        row = conn.execute("SELECT id FROM attendance WHERE user_id = ? AND match_id = ?", (user_id, event_id)).fetchone()
+        col_name = 'match_id'
+    else:
+        row = conn.execute("SELECT id FROM attendance WHERE user_id = ? AND training_id = ?", (user_id, event_id)).fetchone()
+        col_name = 'training_id'
+
+    if row:
+        conn.execute("UPDATE attendance SET present = ? WHERE id = ?", (present, row['id']))
+    else:
+        # Ak záznam neexistuje (hráč ani neklikol účasť), vytvoríme ho
+        conn.execute(
+            f"INSERT INTO attendance(user_id, {col_name}, present) VALUES (?, ?, ?)",
+            (user_id, event_id, present)
+        )
+    conn.commit()

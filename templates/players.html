@@ -43,10 +43,18 @@
               {% if user and (user.role == 'admin' or user.role == 'coach') %}
               <td>
                   <div style="display:flex; gap:0.5rem;">
-                      <a href="{{ url_for('edit_player_ui', player_id=p.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">Upraviť</a>
+                      <a href="{{ url_for('player_attendance_ui', player_id=p.id) }}" style="padding: 0.3rem 0.8rem; background: #ccffd6; color: #019115; text-decoration:none; font-size: 0.7rem; border-radius:4px;">
+                          Účasť
+                      </a>
+
+                      <a href="{{ url_for('edit_player_ui', player_id=p.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">
+                          Upraviť
+                      </a>
                       
                       <form method="post" action="{{ url_for('delete_player_post', player_id=p.id) }}" onsubmit="return confirm('Naozaj vymazať hráča {{ p.first_name }} {{ p.last_name }}?');" style="margin:0;">
-                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">Zmazať</button>
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">
+                              Zmazať
+                          </button>
                       </form>
                   </div>
               </td>
