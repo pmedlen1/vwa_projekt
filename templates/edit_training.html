@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Upraviť tréning{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('trainings_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam</a>
+        <h2 class="page__title">Upraviť tréning</h2>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <form method="post" action="{{ url_for('edit_training_post', training_id=training.id) }}">
+
+      <label>
+        Miesto
+        <input type="text" name="location" value="{{ training.location }}" required>
+      </label>
+
+      <label>
+        Dátum a čas
+        <input type="datetime-local" name="date" value="{{ training.date }}" required>
+      </label>
+
+      <label>
+        Popis
+        <textarea name="description" rows="3">{{ training.description }}</textarea>
+      </label>
+
+      <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+          <button type="submit" class="button">Uložiť zmeny</button>
+          <a href="{{ url_for('trainings_ui') }}" class="button" style="background: var(--muted);">Zrušiť</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

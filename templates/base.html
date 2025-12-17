@@ -21,6 +21,7 @@
     {% set active_endpoint = request.scope['endpoint'].__name__ %}
     <nav class="top-nav">
                 <div class="nav-links">
+                    <!-- DASHBOARD -->
             <a
               class="nav-link{% if active_endpoint == 'dashboard_ui' %} is-active{% endif %}"
               href="{{ url_for('dashboard_ui') }}"
@@ -29,8 +30,7 @@
               {% if active_endpoint == 'dashboard_ui' %}aria-current="page"{% endif %}>
                 <span class="material-symbols-outlined" aria-hidden="true">dashboard</span>
             </a>
-
-            <!-- ZMENA: Odkaz na Zápasy -->
+                <!-- ZAPASY -->
             <a
               class="nav-link{% if 'matches' in active_endpoint %} is-active{% endif %}"
               href="{{ url_for('matches_ui') }}"
@@ -39,19 +39,41 @@
               {% if'matches' in active_endpoint %}aria-current="page"{% endif %}>
                 <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
             </a>
-
+                <!-- HRACI -->
+             {% if current_user and (current_user.role == 'admin' or current_user.role == 'coach') %}
              <a class="nav-link {% if 'players' in active_endpoint %}is-active{% endif %}"
-                href="{{ url_for('players_ui') }}" ...>
+               href="{{ url_for('players_ui') }}"
+               title="Správa hráčov"
+               aria-label="Správa hráčov">
                 <span class="material-symbols-outlined">group</span>
-             </a>
+            </a>
+             {% endif %}
+                <!-- TRENINGY -->
+             <a class="nav-link {% if 'trainings' in active_endpoint %}is-active{% endif %}"
+                href="{{ url_for('trainings_ui') }}"
+                 title="Trénigy"
+                 arial-label="Trénigy">
+                <span class="material-symbols-outlined">sprint</span>
+            </a>
         </div>
 
         <div class="nav-footer">
             {% if current_user %}
+                <a class="nav-link" href="{{ url_for('profile_ui') }}"
+                    title="Profil"
+                    aria-label="Profil"
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; padding: 10px 0">
+                    <span class="material-symbols-outlined">account_circle</span>
+                    {{ current_user.username }}
+
+                </a>
+
                 <div class="user-info" aria-hidden="false">
-                    <span class="user-name">Přihlášen: {{ current_user.username }}</span>
-                    <small class="user-role">({{ current_user.role }})</small>
+                    <small class="user-role"
+                          style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; padding: 10px 0"
+                    >({{ current_user.role }})</small>
                 </div>
+
                 <form method="post" action="{{ url_for('logout') }}">
                     <button class="nav-btn" type="submit" title="Odhlásit" aria-label="Odhlásit">
                         <span class="material-symbols-outlined" aria-hidden="true">logout</span>

@@ -7,6 +7,9 @@ from services.auth import AuthService, User
 from services.matches import MatchesService
 from services.players import PlayersService
 from services.session import session_store, SESSION_COOKIE_NAME
+from services.stats import StatsService
+from services.trainings import TrainingsService
+
 
 def get_conn() -> Iterator[sqlite3.Connection]:
     with open_connection() as conn:
@@ -24,9 +27,15 @@ def matches_service(conn: sqlite3.Connection = Depends(get_conn)) -> MatchesServ
 def players_service(conn: sqlite3.Connection = Depends(get_conn)) -> PlayersService:
     return PlayersService(conn)
 
+def trainings_service(conn = Depends(get_conn)) -> TrainingsService:
+    return TrainingsService(conn)
+
 def get_current_user(request: Request) -> Optional[User]:
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
     return session_store.get_user(session_id)
+
+def stats_service(conn = Depends(get_conn)) -> StatsService:
+    return StatsService(conn)
 
 def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
     if not user:

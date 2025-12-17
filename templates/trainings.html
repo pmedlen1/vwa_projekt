@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Tréningy{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+      <span class="page__kicker">Tím A</span>
+      <h2 class="page__title">Tréningy</h2>
+      <p class="page__subtitle">Plán tréningov.</p>
+    </div>
+  </div>
+
+  <!-- Formulár pre pridanie (Tréner/Admin) -->
+  {% if user and (user.role == 'admin' or user.role == 'coach') %}
+  <div class="card form-card stack-md" style="margin-bottom: 2rem;">
+      <h3>Naplánovať tréning</h3>
+      <form method="post" action="{{ url_for('create_training_post') }}" style="flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 1rem;">
+          <label>
+              Miesto
+              <input type="text" name="location" placeholder="Hlavné ihrisko" required>
+          </label>
+          <label>
+              Dátum a čas
+              <input type="datetime-local" name="date" required>
+          </label>
+          <label style="flex-grow: 1;">
+              Popis
+              <input type="text" name="description" placeholder="Kondičný tréning...">
+          </label>
+          <button type="submit" class="button">Pridať</button>
+      </form>
+  </div>
+  {% endif %}
+
+  <!-- Zoznam -->
+  <div class="card table-card stack-md">
+    {% if trainings|length == 0 %}
+      <p style="margin:0; color: var(--muted);">Žiadne naplánované tréningy.</p>
+    {% else %}
+      <table class="data">
+        <thead>
+            <tr>
+                <th>Dátum</th>
+                <th>Miesto</th>
+                <th>Popis</th>
+                {% if user and user.role == 'player' %}<th>Moja účasť</th>{% endif %}
+                {% if user and (user.role == 'admin' or user.role == 'coach') %}<th>Akcie</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for t in trainings %}
+          <tr>
+              <td style="white-space: nowrap;">
+                  {{ t.date|replace("T", " ") }}
+              </td>
+              <td>{{ t.location }}</td>
+              <td>{{ t.description }}</td>
+              
+              {% if user and user.role == 'player' %}
+              <td>
+                  <form method="post" action="{{ url_for('toggle_training_attendance_post', training_id=t.id) }}">
+                      {% if t.attendance_confirmed %}
+                        <button type="submit" style="background: #d1fae5; color: #065f46; padding: 0.3rem 0.8rem; font-size: 0.8rem; border:1px solid #a7f3d0; border-radius:15px; cursor:pointer;">
+                            ✓ Potvrdené
+                        </button>
+                      {% else %}
+                        <button type="submit" style="background: #fff; color: #6b7280; padding: 0.3rem 0.8rem; font-size: 0.8rem; border:1px solid #d1d5db; border-radius:15px; cursor:pointer;">
+                            Potvrdiť účasť
+                        </button>
+                      {% endif %}
+                  </form>
+              </td>
+              {% endif %}
+
+              {% if user and (user.role == 'admin' or user.role == 'coach') %}
+              <td>
+                  <div style="display:flex; gap:0.5rem;">
+                      <a href="{{ url_for('edit_training_ui', training_id=t.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">Upraviť</a>
+                      
+                      <form method="post" action="{{ url_for('delete_training_post', training_id=t.id) }}" onsubmit="return confirm('Naozaj zrušiť tréning?');" style="margin:0;">
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">Zmazať</button>
+                      </form>
+                  </div>
+              </td>
+              {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
