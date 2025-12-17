@@ -1,12 +1,14 @@
 from datetime import datetime
 from typing import Optional
 from fastapi import APIRouter, Depends, Request
+import sqlite3
 from starlette.responses import RedirectResponse
 from services.auth import User
 from services.matches import MatchesService
 from services.players import PlayersService
 from services.trainings import TrainingsService
-from dependencies import (get_current_user, matches_service, players_service, trainings_service)
+from dependencies import (get_current_user, matches_service, players_service, trainings_service, get_conn)
+from repositories.users import get_user_by_id
 
 router = APIRouter()
 
@@ -16,12 +18,15 @@ async def dashboard_ui(
     user: Optional[User] = Depends(get_current_user),
     matches_svc: MatchesService = Depends(matches_service),
     players_svc: PlayersService = Depends(players_service),
-    trainings_svc: TrainingsService = Depends(trainings_service)
+    trainings_svc: TrainingsService = Depends(trainings_service),
+    conn: sqlite3.Connection = Depends(get_conn)
 ):
-    # Ak používateľ nie je prihlásený, zobrazíme buď login alebo verejnú domovskú stránku.
-    # Tu presmerujeme rovno na login, ak je to "dashboard".
-    # Alebo môžeme nechať renderovať template a v ňom ukázať "Prihláste sa".
-    # Pre dashboard je lepšie, ak neexistuje user, zobraziť len základné info.
+
+    template_user = user
+    if user:
+        full_user_data = get_user_by_id(conn, user.id)
+        if full_user_data:
+            template_user = full_user_data
 
     data = {}
 

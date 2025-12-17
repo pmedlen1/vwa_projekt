@@ -6,54 +6,59 @@
   <div class="page__header">
     <div class="page__titles">
       <h2 class="page__title">Môj Profil</h2>
-      <p class="page__subtitle">Osobné údaje a štatistiky.</p>
+      <p class="page__subtitle">Osobné údaje a nastavenia.</p>
     </div>
   </div>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-      
-      <!-- Karta Osobné Údaje -->
+
       <div class="card stack-md">
           <h3>Osobné údaje</h3>
           <div style="display: flex; flex-direction: column; gap: 1rem;">
+
               <div>
                   <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Meno a Priezvisko</span>
                   <span style="font-size: 1.1rem; font-weight: 500;">
-                      {% if user_details %}
-                        {{ user_details.first_name }} {{ user_details.last_name }}
+                      {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
                       {% else %}
-                        {{ user.username }}
-                      {% endif %}
-                  </span>
-              </div>
-              
-              <div>
-                  <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Rola v systéme</span>
-                  <span style="display: inline-block; padding: 0.2rem 0.6rem; background: #e0f2fe; color: #0369a1; border-radius: 99px; font-size: 0.85rem;">
-                      {{ user.role|upper }}
+                        {{ user.username }} {% endif %}
                   </span>
               </div>
 
-              {% if player_details %}
+              <div>
+                  <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Rola v systéme</span>
+                  <span style="display: inline-block; padding: 0.2rem 0.6rem; background: #e0f2fe; color: #0369a1; border-radius: 99px; font-size: 0.85rem;">
+                      {% if user.role == 'admin' %}Administrátor
+                      {% elif user.role == 'coach' %}Tréner
+                      {% else %}Hráč
+                      {% endif %}
+                  </span>
+              </div>
+
+              <div>
+                  <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Prihlasovacie meno</span>
+                  <span>@{{ user.username }}</span>
+              </div>
+
+              {% if user.role == 'player' %}
               <div>
                   <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Pozícia</span>
-                  <span>{{ player_details.position }}</span>
+                  <span>{{ user.position if user.position else 'Neurčená' }}</span>
               </div>
               <div>
                   <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Dátum narodenia</span>
-                  <span>{{ player_details.birth_date }}</span>
+                  <span>{{ user.birth_date if user.birth_date else '--' }}</span>
               </div>
               {% endif %}
           </div>
       </div>
 
-      <!-- Karta Štatistiky (Len pre hráčov) -->
-      {% if stats %}
+      {% if user.role == 'player' and stats %}
       <div class="card stack-md">
           <h3>Moje Štatistiky</h3>
-          
+
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-              <!-- Zápasy -->
               <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; text-align: center;">
                   <span class="material-symbols-outlined" style="font-size: 2rem; color: var(--accent);">sports_soccer</span>
                   <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">{{ stats.matches_attended }}</div>
@@ -63,7 +68,6 @@
                   </div>
               </div>
 
-              <!-- Tréningy -->
               <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; text-align: center;">
                   <span class="material-symbols-outlined" style="font-size: 2rem; color: #059669;">fitness_center</span>
                   <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">{{ stats.trainings_attended }}</div>
