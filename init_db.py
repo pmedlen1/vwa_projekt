@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS matches (
     date DATETIME NOT NULL,
     opponent TEXT NOT NULL,
     location TEXT NOT NULL,
-    home_score INTEGER DEFAULT 0,
-    away_score INTEGER DEFAULT 0,
+    home_score INTEGER DEFAULT NULL CHECK (home_score IS NULL OR home_score >= 0),
+    away_score INTEGER DEFAULT NULL CHECK (away_score IS NULL OR away_score >= 0),
     team_id INTEGER,
     FOREIGN KEY (team_id) REFERENCES teams(id)
 );
@@ -75,8 +75,8 @@ DROP TABLE IF EXISTS attendance;
 DROP TABLE IF EXISTS evaluations;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS trainings;
-DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS teams;
 DROP TABLE IF EXISTS items;
 """
 

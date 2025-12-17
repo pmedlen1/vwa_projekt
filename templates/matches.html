@@ -5,7 +5,7 @@
 <div class="page">
   <div class="page__header">
     <div class="page__titles">
-      <span class="page__kicker">Sezóna 2023/2024</span>
+      <span class="page__kicker">Sezóna 2025/2026</span>
       <h2 class="page__title">Zápasy</h2>
       <p class="page__subtitle">Plán a výsledky zápasov tímu.</p>
     </div>
@@ -22,7 +22,7 @@
           </label>
           <label>
               Miesto
-              <input type="text" name="location" placeholder="Domov / Vonku" required>
+              <input type="text" name="location" placeholder="Doma / Vonku" required>
           </label>
           <label>
               Dátum a čas
@@ -46,7 +46,9 @@
                 <th>Súper</th>
                 <th>Miesto</th>
                 <th>Výsledok</th>
-                {% if user and user.role == 'admin' or 'coach' %}<th>Akcie</th>{% endif %}
+                {% if user and user.role == 'player' %}<th>Moja účasť</th>{% endif %}
+
+                {% if user and (user.role == 'admin' or user.role == 'coach') %}<th>Akcie</th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -56,19 +58,38 @@
               <td><strong>vs {{ m.opponent }}</strong></td>
               <td>{{ m.location }}</td>
               <td>
-                  {% if m.home_score is defined and m.away_score is defined %}
+                  {% if m.home_score is not none and m.away_score is not none %}
                     <span style="font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px;">
                         {{ m.home_score }}:{{ m.away_score }}
                     </span>
                   {% else %}
-                    -:-
+                    <span style="color: #999;">-:-</span>
                   {% endif %}
               </td>
-              {% if user and user.role == 'admin' or 'coach' %}
+              {% if user and user.role == 'player' %}
               <td>
-                  <form method="post" action="{{ url_for('delete_match_post', match_id=m.id) }}" onsubmit="return confirm('Naozaj vymazať tento zápas?');">
-                      <button type="submit" style="padding: 0.3rem 0.8rem; background: #ea5d61; font-size: 0.7rem; border:none; color:white; border-radius:4px; cursor:pointer;">Zmazať</button>
+                  <form method="post" action="{{ url_for('toggle_attendance_post', match_id=m.id) }}">
+                      {% if m.attendance_confirmed %}
+                        <button type="submit" style="background: #d1fae5; color: #065f46; padding: 0.3rem 0.8rem; font-size: 0.8rem; border:1px solid #a7f3d0; border-radius:15px; cursor:pointer; transition: all 0.2s;">
+                            ✓ Potvrdené
+                        </button>
+                      {% else %}
+                        <button type="submit" style="background: #fff; color: #6b7280; padding: 0.3rem 0.8rem; font-size: 0.8rem; border:1px solid #d1d5db; border-radius:15px; cursor:pointer; transition: all 0.2s;">
+                            Potvrdiť účasť
+                        </button>
+                      {% endif %}
                   </form>
+              </td>
+              {% endif %}
+              {% if user and (user.role == 'admin' or user.role == 'coach') %}
+              <td>
+                  <div style="display:flex; gap:0.5rem;">
+                      <a href="{{ url_for('edit_match_ui', match_id=m.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.7rem; border-radius:4px;">Upraviť</a>
+
+                      <form method="post" action="{{ url_for('delete_match_post', match_id=m.id) }}" onsubmit="return confirm('Naozaj vymazať tento zápas?');" style="margin:0;">
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.7rem; border:none; border-radius:4px; cursor:pointer;">Zmazať</button>
+                      </form>
+                  </div>
               </td>
               {% endif %}
           </tr>

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Upraviť zápas{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('matches_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam</a>
+        <h2 class="page__title">Upraviť zápas</h2>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <form method="post" action="{{ url_for('edit_match_post', match_id=match.id) }}">
+      
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <label style="flex:1;">
+            Súper
+            <input type="text" name="opponent" value="{{ match.opponent }}" required>
+          </label>
+          <label style="flex:1;">
+            Miesto
+            <input type="text" name="location" value="{{ match.location }}" required>
+          </label>
+      </div>
+      
+      <label>
+        Dátum a čas
+        <input type="datetime-local" name="date" value="{{ match.date }}" required>
+      </label>
+
+      <h3 style="margin-top:1.5rem; margin-bottom:0.5rem; font-size:1rem;">Výsledok</h3>
+      <div style="display:flex; gap:1rem; align-items:center;">
+          <label style="width:100px;">
+            Domáci
+            <input type="number" name="home_score" value="{{ match.home_score if match.home_score is not none else '' }}">
+          </label>
+          <span style="font-weight:bold; font-size:1.5rem; padding-top:1rem;">:</span>
+          <label style="width:100px;">
+            Hostia
+            <input type="number" name="away_score" value="{{ match.away_score if match.away_score is not none else '' }}">
+          </label>
+      </div>
+
+      <div style="margin-top:1.5rem; display:flex; gap:1rem;">
+          <button type="submit" class="button">Uložiť zmeny</button>
+          <a href="{{ url_for('matches_ui') }}" class="button" style="background: var(--muted);">Zrušiť</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

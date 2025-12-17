@@ -73,11 +73,15 @@ async def edit_match_post(
     opponent: str = Form(...),
     location: str = Form(...),
     date: str = Form(...),
-    home_score: Optional[int] = Form(None),
-    away_score: Optional[int] = Form(None),
+    home_score: Optional[str] = Form(None),
+    away_score: Optional[str] = Form(None),
     svc: MatchesService = Depends(matches_service),
     user: User = Depends(require_admin_or_coach),
 ):
+    # Konverzia: Ak je string prázdny, nastavíme None. Inak prevedieme na int.
+    h_score_int = int(home_score) if home_score and home_score.strip() else None
+    a_score_int = int(away_score) if away_score and away_score.strip() else None
+
     svc.update_match(match_id, date, opponent, location, home_score, away_score)
     return RedirectResponse(url=request.url_for("matches_ui"), status_code=status.HTTP_303_SEE_OTHER)
 
