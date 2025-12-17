@@ -21,10 +21,9 @@ class PlayersService:
                       position: str, birth_date: str,) -> int:
         default_password = "hrac123"
         password = pwd_context.hash(default_password)
-
         return repo_insert_player(self.conn, username, password, first_name, last_name, position, birth_date)
 
-    def update_player(self, player_id: int, first_name: str, last_name: str, position: str, birth_date: str ):
+    def update_player_info(self, player_id: int, first_name: str, last_name: str, position: str, birth_date: str ):
         repo_update_player(self.conn, player_id, first_name, last_name, position, birth_date)
 
     def delete_player(self, player_id: int):
