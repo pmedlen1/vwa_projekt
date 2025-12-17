@@ -1,11 +1,8 @@
 import sqlite3
 from typing import List, Dict, Any, Optional
 
-# 1. Získanie všetkých zápasov
+# Získanie všetkých zápasov
 def list_matches(conn: sqlite3.Connection) -> List[Dict[str, Any]]:
-    # Spojíme tabuľku matches s teams, aby sme videli názov tímu súpera (ak by sme ho mali v db,
-    # ale v tvojom návrhu je súper len text 'opponent', takže stačí jednoduchý select).
-    # Vyberáme aj ID, aby sme mohli zápas zmazať.
     rows = conn.execute(
         """
         SELECT id, date, opponent, location, home_score, away_score 
@@ -15,7 +12,7 @@ def list_matches(conn: sqlite3.Connection) -> List[Dict[str, Any]]:
     ).fetchall()
     return [dict(r) for r in rows]
 
-# 2. Vloženie nového zápasu
+#  Vloženie nového zápasu
 def insert_match(
     conn: sqlite3.Connection,
     date: str,
@@ -30,15 +27,75 @@ def insert_match(
     conn.commit()
     return cur.lastrowid
 
-# 3. Vymazanie zápasu
+# Vymazanie zápasu
 def delete_match(conn: sqlite3.Connection, match_id: int) -> None:
     conn.execute("DELETE FROM matches WHERE id = ?", (match_id,))
     conn.commit()
 
-# 4. Aktualizácia skóre (pre trénera)
+#  Aktualizácia skóre (pre trénera)
 def update_score(conn: sqlite3.Connection, match_id: int, home: int, away: int) -> None:
     conn.execute(
         "UPDATE matches SET home_score = ?, away_score = ? WHERE id = ?",
         (home, away, match_id)
     )
+    conn.commit()
+
+# Získanie jedného zápasu podľa ID
+def get_match(conn: sqlite3.Connection, match_id: int) -> Optional[Dict[str, Any]]:
+    row = conn.execute(
+        "SELECT * FROM matches WHERE id = ?",
+        (match_id,)
+    ).fetchone()
+    return dict(row) if row else None
+
+# Aktualizácia zápasu (skóre, dátum, miesto)
+def update_match(
+    conn: sqlite3.Connection,
+    match_id: int,
+    date: str,
+    opponent: str,
+    location: str,
+    home_score: Optional[int],
+    away_score: Optional[int]
+) -> None:
+    conn.execute(
+        """
+        UPDATE matches 
+        SET date = ?, opponent = ?, location = ?, home_score = ?, away_score = ?
+        WHERE id = ?
+        """,
+        (date, opponent, location, home_score, away_score, match_id)
+    )
+    conn.commit()
+
+#   ÚČASŤ
+
+def get_attendance(conn: sqlite3.Connection, user_id: int, match_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Získa záznam o účasti pre daného používateľa a zápas.
+    Vráti None, ak záznam neexistuje.
+    """
+    row = conn.execute(
+        "SELECT * FROM attendance WHERE user_id = ? AND match_id = ?",
+        (user_id, match_id)
+    ).fetchone()
+    return dict(row) if row else None
+
+def set_attendance(conn: sqlite3.Connection, user_id: int, match_id: int, confirmed: bool) -> None:
+    """
+    Nastaví alebo aktualizuje stav účasti (potvrdenie).
+    Ak záznam neexistuje, vytvorí ho. Ak existuje, aktualizuje stĺpec 'confirmed'.
+    """
+    existing = get_attendance(conn, user_id, match_id)
+
+    if existing:
+        conn.execute(
+            "UPDATE attendance SET confirmed = ? WHERE id = ?",
+            (confirmed, existing['id'])
+        )
+    else:
+        conn.execute(
+            "INSERT INTO attendance(user_id, match_id, confirmed) VALUES (?, ?, ?)",
+            (user_id, match_id, confirmed)
+        )
     conn.commit()

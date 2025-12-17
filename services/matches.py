@@ -19,3 +19,4 @@ class MatchesService:
 
     def set_score(self, match_id: int, home_goals: int, away_goals: int):
         repo_update_score(self.conn, match_id, home_goals, away_goals)
+
