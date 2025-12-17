@@ -1,7 +1,9 @@
 import sqlite3
 from typing import List, Dict, Any
 # Importujeme funkcie, ktoré sme práve vytvorili
-from repositories.matches import list_matches as repo_list_matches, insert_match as repo_insert_match, delete_match as repo_delete_match, update_score as repo_update_score
+from repositories.matches import (list_matches as repo_list_matches, insert_match as repo_insert_match, delete_match as repo_delete_match,
+                                  update_score as repo_update_score, get_attendance as repo_get_attendance, set_attendance as repo_set_attendance,
+                                  get_match as repo_get_match, update_match as repo_update_match,)
 
 class MatchesService:
     def __init__(self, conn: sqlite3.Connection):
@@ -20,3 +22,17 @@ class MatchesService:
     def set_score(self, match_id: int, home_goals: int, away_goals: int):
         repo_update_score(self.conn, match_id, home_goals, away_goals)
 
+    def get_match(self, match_id: int) -> Dict[str, Any]:
+        return repo_get_match(self.conn, match_id)
+
+    def update_match(self, match_id: int, opponent: str ,location: str,date: str, home_goals: int, away_goals: int):
+        repo_update_match(self.conn, match_id, opponent, location, date, home_goals, away_goals)
+
+    def get_player_attendance(self, user_id: int, match_id: int) -> bool:
+        att = repo_get_attendance(self.conn, user_id, match_id)
+        if att and att['confirmed']:
+            return True
+        return False
+
+    def confirm_attendance(self, user_id: int, match_id: int, confirmed: bool = True):
+        repo_set_attendance(self.conn, user_id, match_id, confirmed)
