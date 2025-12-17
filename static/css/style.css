@@ -15,9 +15,9 @@ html, body {
    2) CSS VARIABLES
 --------------------------------------------------*/
 :root {
-    --bg: #f5efe8;
+    --bg: #ffffff;
     --card: #ffffff;
-    --accent: #ff621d;
+    --accent: #029c02;
     --accent-dark: #1f2333;
     --text: #2b2d31;
     --muted: #787a83;
@@ -40,7 +40,7 @@ html, body {
 .main {
     flex-grow: 1;
     padding: 30px 20px;
-    background: lightgray;
+    background: #dbffe2;
 }
 
 /* -------------------------------------------------

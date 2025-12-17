@@ -72,10 +72,8 @@
                 <a class="nav-link {% if 'profile' in active_endpoint %}is-active{% endif %}"
                    href="{{ url_for('profile_ui') }}"
                     title="Profil"
-                    aria-label="Profil"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; padding: 10px 0">
+                    aria-label="Profil">
                     <span class="material-symbols-outlined">account_circle</span>
-                    {{current_user.username}}
 
                 </a>
 

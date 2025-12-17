@@ -9,6 +9,7 @@ from services.players import PlayersService
 from services.session import session_store, SESSION_COOKIE_NAME
 from services.stats import StatsService
 from services.trainings import TrainingsService
+from services.users import UsersService
 
 
 def get_conn() -> Iterator[sqlite3.Connection]:
@@ -17,6 +18,9 @@ def get_conn() -> Iterator[sqlite3.Connection]:
 
 def items_service(conn: sqlite3.Connection = Depends(get_conn)) -> ItemsService:
     return ItemsService(conn)
+
+def users_service(conn=Depends(get_conn)):
+    return UsersService(conn)
 
 def auth_service(conn: sqlite3.Connection = Depends(get_conn)) -> AuthService:
     return AuthService(conn)

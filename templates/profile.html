@@ -19,8 +19,8 @@
               <div>
                   <span style="font-size: 0.85rem; color: var(--muted); display: block; margin-bottom: 0.2rem;">Meno a Priezvisko</span>
                   <span style="font-size: 1.1rem; font-weight: 500;">
-                      {% if player_details %}
-                        {{ player_details.first_name }} {{ player_details.last_name }}
+                      {% if user_details %}
+                        {{ user_details.first_name }} {{ user_details.last_name }}
                       {% else %}
                         {{ user.username }}
                       {% endif %}

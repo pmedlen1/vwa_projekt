@@ -5,18 +5,18 @@
 <div class="page">
   <div class="page__header">
     <div class="page__titles">
-      <span class="page__kicker">Uživatel</span>
-      <h2 class="page__title">Přihlášení</h2>
-      <p> class="page__subtitle">Zadejte své přihlašovací údaje.</p>
+      <span class="page__kicker">Uživateľ</span>
+      <h2 class="page__title">Prihlásenie</h2>
+      <p> Zadajte svoje prihlasovacie údaje.</p>
     </div>
   </div>
 
   <div class="card form-card">
     {% if error %}
-      <p> class="error" style="margin:0;">{{ error }}</p>
+      <span class="error" style="margin:0;">{{ error }}</span>
     {% endif %}
     <form method="post" action="{{ url_for('login_post') }}">
-      <label>Uživatelské jméno
+      <label>Uživateľské meno
         <input type="text" name="username" required>
       </label>
       <label>Heslo

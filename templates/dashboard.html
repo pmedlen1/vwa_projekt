@@ -2,137 +2,180 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    {% set current_user = get_user(request) %}
-    <main class="dashboard">
-        <header class="dashboard__header">
-            <div>
-                {% if current_user %}
-                    <p class="dashboard__kicker">Vítej, {{ current_user.username }}</p>
-                {% else %}
-                    <p class="dashboard__kicker">Analytics</p>
-                {% endif %}
-                <h1 class="dashboard__title">Campaign Overview</h1>
-                <p class="dashboard__subtitle">facebook.com/companyname</p>
-            </div>
-            <div class="dashboard__actions">
-                <div class="search-field">
-                    <input type="text" placeholder="Search" />
-                    <span class="search-icon">⌕</span>
+<div class="page dashboard">
+
+  {% if not user %}
+  <div class="card" style="text-align: center; padding: 4rem 2rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Vitajte v klube FK Lokomotíva</h1>
+      <p style="color: var(--muted); margin-bottom: 2rem;">Pre prístup k rozpisu zápasov, tréningom a štatistikám sa prosím prihláste.</p>
+      <a href="{{ url_for('login_ui') }}" class="button big-black-button">Prihlásiť sa</a>
+  </div>
+
+  {% else %}
+
+  <div class="dashboard__header">
+    <div class="dashboard__titles">
+      <span class="dashboard__kicker">Prehľad</span>
+      <h2 class="dashboard__title">Vitaj späť, {{ user.username }}!</h2>
+      <p class="dashboard__subtitle">Tu je prehľad toho najdôležitejšieho pre teba.</p>
+    </div>
+    <div class="dashboard__actions">
+        <a href="{{ url_for('profile_ui') }}" class="button" style="background: white; color: var(--text); border: 1px solid #ddd;">Môj profil</a>
+    </div>
+  </div>
+
+  {% if user.role == 'admin' %}
+
+  <div class="summary-grid">
+      <div class="card mini-card gradient-card">
+          <span class="card__label">Registrovaní hráči</span>
+          <div class="card__value">{{ data.players_count }}</div>
+          <small>Aktívna súpiska</small>
+      </div>
+      <div class="card mini-card">
+          <span class="card__label">Všetky zápasy</span>
+          <div class="card__value">{{ data.matches_count }}</div>
+          <a href="{{ url_for('matches_ui') }}" style="font-size:0.8rem; color: var(--accent);">Spravovať zápasy &rarr;</a>
+      </div>
+      <div class="card mini-card">
+          <span class="card__label">Tréningy</span>
+          <div class="card__value">{{ data.trainings_count }}</div>
+          <a href="{{ url_for('trainings_ui') }}" style="font-size:0.8rem; color: var(--accent);">Rozpis tréningov &rarr;</a>
+      </div>
+  </div>
+
+  <div class="card stack-md">
+      <h3>Rýchle akcie</h3>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+          <a href="{{ url_for('create_player_ui') }}" class="button">Pridať hráča</a>
+          <a href="{{ url_for('create_match_post') }}" onclick="alert('Použi sekciu Zápasy na pridanie'); return false;" class="button" style="background:#eee; color:#333;">Pridať zápas</a>
+      </div>
+  </div>
+
+  {% elif user.role == 'coach' %}
+
+  <div class="dashboard__columns">
+      <div class="dashboard__column dashboard__column--left">
+          <h3 style="margin-bottom:0.5rem;">Čo ťa čaká</h3>
+
+          <div class="dashboard__row">
+              <div class="card stack-md" style="flex:1;">
+                  <span class="card__label" style="color:var(--accent);">Najbližší zápas</span>
+                  {% if data.next_match %}
+                    <div>
+                        <div class="card__value" style="font-size:1.5rem; margin-bottom:0.2rem;">{{ data.next_match.opponent }}</div>
+                        <div style="color:var(--muted); font-size:0.9rem;">
+                            <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:text-bottom;">calendar_today</span>
+                            {{ data.next_match.date.replace('T', ' ') }}
+                        </div>
+                        <div style="color:var(--muted); font-size:0.9rem;">
+                             <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:text-bottom;">location_on</span>
+                             {{ data.next_match.location }}
+                        </div>
+                    </div>
+                    <div style="margin-top:auto;">
+                        <a href="{{ url_for('manage_match_ui', match_id=data.next_match.id) }}" class="button" style="font-size:0.8rem;">Spravovať súpisku</a>
+                    </div>
+                  {% else %}
+                    <p style="color:var(--muted);">Žiadne naplánované zápasy.</p>
+                    <a href="{{ url_for('matches_ui') }}" class="button">Naplánovať zápas</a>
+                  {% endif %}
+              </div>
+
+              <div class="card stack-md" style="flex:1;">
+                  <span class="card__label" style="color:#2563eb;">Najbližší tréning</span>
+                  {% if data.next_training %}
+                    <div>
+                        <div class="card__value" style="font-size:1.5rem; margin-bottom:0.2rem;">{{ data.next_training.location }}</div>
+                        <div style="color:var(--muted); font-size:0.9rem;">
+                            {{ data.next_training.date.replace('T', ' ') }}
+                        </div>
+                        {% if data.next_training.description %}
+                        <p style="font-size:0.85rem; color:#555; margin-top:0.5rem;">{{ data.next_training.description }}</p>
+                        {% endif %}
+                    </div>
+                  {% else %}
+                    <p style="color:var(--muted);">Žiadne tréningy.</p>
+                    <a href="{{ url_for('trainings_ui') }}" class="button">Pridať tréning</a>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+
+      <div class="dashboard__column dashboard__column--right">
+          <div class="card mini-card">
+              <span class="card__label">Počet hráčov</span>
+              <div class="card__value">{{ data.players_count }}</div>
+              <a href="{{ url_for('players_ui') }}" style="font-size:0.8rem;">Zobraziť tím &rarr;</a>
+          </div>
+          <div class="card mini-card">
+               <span class="card__label">Zápasov v sezóne</span>
+               <div class="card__value">{{ data.matches_count }}</div>
+          </div>
+      </div>
+  </div>
+
+  {% elif user.role == 'player' %}
+
+  <div class="dashboard__columns">
+      <div class="dashboard__column dashboard__column--left">
+          <h3 style="margin-bottom:0.5rem;">Tvoj najbližší program</h3>
+
+          {% if data.upcoming_events %}
+            {% for event in data.upcoming_events[:3] %}
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 1.5rem;">
+                <div>
+                    <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;
+                                color: {% if event.type == 'match' %}var(--accent){% else %}#2563eb{% endif %}; font-weight:bold;">
+                        {% if event.type == 'match' %}Zápas{% else %}Tréning{% endif %}
+                    </div>
+                    <div style="font-weight:700; font-size:1.1rem; margin-bottom:0.2rem;">{{ event.title.replace('Zápas: ', '').replace('Tréning: ', '') }}</div>
+                    <div style="color:var(--muted); font-size:0.9rem;">
+                        <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:text-bottom;">schedule</span>
+                        {{ event.date.replace('T', ' ') }}
+                    </div>
                 </div>
-                <button class="btn-primary">New Company</button>
-            </div>
-        </header>
 
-        <div class="dashboard__columns">
-            <div class="dashboard__column dashboard__column--left">
-                <div class="dashboard__row">
-                    <article class="card gradient-card">
-                        <div class="card__label">Total Likes</div>
-                        <div class="card__value">23.0000K</div>
-                        <div class="chart-placeholder">Wave graph placeholder</div>
-                        <div class="card__legend">
-                            <span>Female 20%</span>
-                            <span>Male 50%</span>
-                            <span>Other 30%</span>
-                        </div>
-                    </article>
-
-                    <article class="card">
-                        <div class="card__label">Pending Messages</div>
-                        <div class="card__value">20k</div>
-                        <div class="chart-placeholder circle">Circular chart placeholder</div>
-                        <div class="card__legend">
-                            <span>Female 80%</span>
-                            <span>Male 20%</span>
-                        </div>
-                    </article>
+                <div>
+                    {% if event.type == 'match' %}
+                         <form action="{{ url_for('toggle_attendance_post', match_id=event.event_id) }}" method="post">
+                             {% if event.confirmed %}
+                                <button type="submit" class="button" style="background:#ccffd6; color:#019115;">Potvrdené ✓</button>
+                             {% else %}
+                                <button type="submit" class="button" style="background:#fee2e2; color:#991b1b;">Nepotvrdené</button>
+                             {% endif %}
+                         </form>
+                    {% else %}
+                         <div style="background:#f3f4f6; padding:0.5rem 1rem; border-radius:999px; font-size:0.8rem; color:#555;">
+                             Účasť
+                         </div>
+                    {% endif %}
                 </div>
-
-                <article class="card activity-card">
-                    <header class="activity-card__header">
-                        <h2>Post Activity</h2>
-                    </header>
-
-                    <ul class="activity-list">
-                        <li>
-                            <div>
-                                <h3>What is the value for your company</h3>
-                                <p>Post number 2</p>
-                            </div>
-                            <div class="activity-meta">
-                                <span>Company</span>
-                                <strong>7k</strong>
-                                <span class="trend down">▼ 4%</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h3>How to sell stuff?</h3>
-                                <p>Post number 1</p>
-                            </div>
-                            <div class="activity-meta">
-                                <span>Blog</span>
-                                <strong>3k</strong>
-                                <span class="trend up">▲ 5%</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h3>New Product</h3>
-                                <p>Post number 3</p>
-                            </div>
-                            <div class="activity-meta">
-                                <span>Product</span>
-                                <strong>2k</strong>
-                                <span class="trend up">▲ 6%</span>
-                            </div>
-                        </li>
-                        <li>
-                            <div>
-                                <h3>What do you do today?</h3>
-                                <p>Post number 4</p>
-                            </div>
-                            <div class="activity-meta">
-                                <span>Persona</span>
-                                <strong>1k</strong>
-                                <span class="trend up">▲ 8%</span>
-                            </div>
-                        </li>
-                    </ul>
-                </article>
             </div>
+            {% endfor %}
 
-            <div class="dashboard__column dashboard__column--right">
-                <article class="card mini-card">
-                    <div class="mini-card__value">3k</div>
-                    <p>Comments</p>
-                    <div class="progress-bar">
-                        <span></span>
-                    </div>
-                </article>
+            {% if data.upcoming_events|length > 3 %}
+                <div style="text-align:center; margin-top:1rem;">
+                    <a href="{{ url_for('profile_ui') }}" style="color:var(--accent); font-weight:600;">Zobraziť všetky udalosti &rarr;</a>
+                </div>
+            {% endif %}
 
-                <article class="card">
-                    <div class="card__label">Post Stats</div>
-                    <div class="chart-placeholder tall">Bar/line graph placeholder</div>
-                    <div class="completed-block">
-                        <div>
-                            <p>Completed Posts</p>
-                            <small>Current Week</small>
-                        </div>
-                        <strong>874</strong>
-                    </div>
-                </article>
-
-                <article class="card mini-card">
-                    <div class="mini-card__value">10k</div>
-                    <p>Links Shared</p>
-                    <div class="progress-bar dark">
-                        <span></span>
-                    </div>
-                </article>
+          {% else %}
+            <div class="card chart-placeholder">
+                <p>Momentálne ťa nečakajú žiadne zápasy ani tréningy.</p>
+                <p>Uži si voľno! 🏖️</p>
             </div>
-        </div>
-    </main>
+          {% endif %}
+      </div>
 
+      <div class="dashboard__column dashboard__column--right">
+          <div class="card gradient-card">
+              <span class="card__label" style="color:rgba(255,255,255,0.8);">Môj profil</span>
+              <h3 style="margin: 0.5rem 0 1rem;">{{ user.first_name }} {{ user.last_name }}</h3>
+              <p style="font-size:0.9rem; margin:0;">{{ user.position if user.position else 'Hráč' }}</p>
+          </div>
+      </div>
+  </div>
 
+  {% endif %} {% endif %} </div>
 {% endblock %}
