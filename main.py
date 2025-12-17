@@ -16,7 +16,7 @@ from services.players import PlayersService
 from pages.trainings import router as trainings_router
 from services.trainings import TrainingsService
 from pages.profile import router as profile_router
-
+from pages.users import router as users_router
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Futbalový Manažer", version="1.0.0")
@@ -30,7 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(players_router, prefix="/players", tags=["players"])
     app.include_router(trainings_router, prefix="/trainings", tags=["trainings"])
     app.include_router(profile_router, prefix="/profile", tags=["profile"])
-
+    app.include_router(users_router, prefix="/users", tags=["users"])
     # DEBUG: vypiš zaregistrované cesty
     print("=== ROUTES ===")
     for r in app.routes:

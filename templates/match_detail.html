@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Detail Zápasu{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+        <a href="{{ url_for('matches_ui') }}" style="text-decoration:none; color: var(--muted); font-size: 0.9rem;">← Späť na zoznam</a>
+    </div>
+  </div>
+
+  <!-- Veľký Výsledok -->
+  <div style="text-align: center; margin-bottom: 3rem; background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 3rem 1rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <div style="font-size: 1.2rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">
+          {{ match.date|replace("T", " ") }} | {{ match.location }}
+      </div>
+      
+      <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
+          <div style="text-align: right; flex: 1;">
+              <span style="display: block; font-size: 2rem; font-weight: 700;">FK Lokomotíva</span>
+              <span style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.6);">Domáci</span>
+          </div>
+          
+          <div style="font-size: 4rem; font-weight: 800; line-height: 1; background: rgba(255,255,255,0.1); padding: 1rem 2rem; border-radius: 1rem;">
+              {% if match.home_score is not none and match.away_score is not none %}
+                {{ match.home_score }} : {{ match.away_score }}
+              {% else %}
+                - : -
+              {% endif %}
+          </div>
+          
+          <div style="text-align: left; flex: 1;">
+              <span style="display: block; font-size: 2rem; font-weight: 700;">{{ match.opponent }}</span>
+              <span style="display: block; font-size: 0.9rem; color: rgba(255,255,255,0.6);">Hostia</span>
+          </div>
+      </div>
+  </div>
+
+  <!-- Tabuľka Hodnotení -->
+  <div class="card table-card stack-md">
+    <h3 style="margin:0;">Hodnotenie Hráčov</h3>
+    <table class="data">
+        <thead>
+            <tr>
+                <th>Hráč</th>
+                <th>Pozícia</th>
+                <th>Hodnotenie</th>
+                <th>Komentár trénera</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in participants %}
+          <!-- Zobrazíme len hráčov, ktorí majú hodnotenie alebo boli prítomní -->
+          {% if p.evaluation or p.confirmed %}
+          <tr {% if p.id == user.id %}style="background: #f0fdf4;"{% endif %}>
+              <td>
+                  <strong>{{ p.first_name }} {{ p.last_name }}</strong>
+                  {% if p.id == user.id %}<span style="font-size:0.7em; color:green; margin-left:5px;">(Ty)</span>{% endif %}
+              </td>
+              <td>{{ p.position }}</td>
+              <td>
+                  {% if p.evaluation and p.evaluation.rating %}
+                    <span style="font-weight: bold; color: #d97706;">{{ p.evaluation.rating }}/10</span>
+                  {% else %}
+                    <span style="color: #9ca3af;">-</span>
+                  {% endif %}
+              </td>
+              <td>
+                  {% if p.evaluation and p.evaluation.comment %}
+                    {{ p.evaluation.comment }}
+                  {% else %}
+                    -
+                  {% endif %}
+              </td>
+          </tr>
+          {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

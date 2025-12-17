@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Správa používateľov{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="page__header">
+    <div class="page__titles">
+      <h2 class="page__title">Používatelia</h2>
+      <p class="page__subtitle">Admin prehľad: Tréneri, Hráči, Admini.</p>
+    </div>
+    <div class="page__actions">
+        <a href="{{ url_for('create_user_ui') }}" class="button">Pridať používateľa</a>
+    </div>
+  </div>
+
+  <div class="card table-card">
+      <table class="data">
+        <thead>
+            <tr>
+                <th>Rola</th>
+                <th>Meno</th>
+                <th>Username</th>
+                <th>Akcie</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for u in users %}
+          <tr>
+              <td>
+                  {% if u.role == 'admin' %}
+                    <span style="color: #d97706; font-weight:bold;">Admin</span>
+                  {% elif u.role == 'coach' %}
+                    <span style="color: #2563eb; font-weight:bold;">Tréner</span>
+                  {% else %}
+                    <span style="color: #059669;">Hráč</span>
+                  {% endif %}
+              </td>
+              <td>{{ u.first_name }} {{ u.last_name }}</td>
+              <td>{{ u.username }}</td>
+              <td>
+                  <div style="display:flex; gap:0.5rem;">
+                      <a href="{{ url_for('edit_user_ui', user_id=u.id) }}" style="padding: 0.3rem 0.8rem; background: #e0f2fe; color: #0369a1; text-decoration:none; font-size: 0.8rem; border-radius:4px;">
+                          Upraviť
+                      </a>
+                      {% if u.id != user.id %}
+                      <form method="post" action="{{ url_for('delete_user_post', user_id=u.id) }}" onsubmit="return confirm('Naozaj vymazať?');" style="margin:0;">
+                          <button type="submit" style="padding: 0.3rem 0.8rem; background: #fee2e2; color: #991b1b; font-size: 0.8rem; border:none; border-radius:4px; cursor:pointer;">
+                              Zmazať
+                          </button>
+                      </form>
+                      {% endif %}
+                  </div>
+              </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+{% endblock %}

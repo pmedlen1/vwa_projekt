@@ -58,13 +58,24 @@
         </div>
 
         <div class="nav-footer">
+
+            {% if current_user and current_user.role == 'admin' %}
+                <a class="nav-link {% if 'users' in active_endpoint %}is-active{% endif %}"
+                   href="{{ url_for('users_ui') }}"
+                   title="Správa používateľov"
+                   aria-label="Správa používateľov">
+                    <span class="material-symbols-outlined">manage_accounts</span>
+                </a>
+            {% endif %}
+
             {% if current_user %}
-                <a class="nav-link" href="{{ url_for('profile_ui') }}"
+                <a class="nav-link {% if 'profile' in active_endpoint %}is-active{% endif %}"
+                   href="{{ url_for('profile_ui') }}"
                     title="Profil"
                     aria-label="Profil"
                     style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: auto; padding: 10px 0">
                     <span class="material-symbols-outlined">account_circle</span>
-                    {{ current_user.username }}
+                    <span class="nav-text">{{current_user.username}}</span>`
 
                 </a>
 

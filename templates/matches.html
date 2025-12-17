@@ -47,8 +47,7 @@
                 <th>Miesto</th>
                 <th>Výsledok</th>
                 {% if user and user.role == 'player' %}<th>Moja účasť</th>{% endif %}
-
-                {% if user and (user.role == 'admin' or user.role == 'coach') %}<th>Akcie</th>{% endif %}
+                <th>Akcie</th>
             </tr>
         </thead>
         <tbody>
@@ -80,6 +79,11 @@
                         </button>
                       {% endif %}
                   </form>
+              </td>
+              <td>
+                  <a href="{{ url_for('match_detail_ui', match_id=m.id) }}" style="padding: 0.3rem 0.8rem; background: #f3e8ff; color: #6b21a8; text-decoration:none; font-size: 0.7rem; border-radius:4px;">
+                      Detail
+                  </a>
               </td>
               {% endif %}
 

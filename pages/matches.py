@@ -152,3 +152,28 @@ async def evaluate_player_post(
         url=request.url_for("manage_match_ui", match_id=match_id),
         status_code=status.HTTP_303_SEE_OTHER
     )
+
+# Detail zápasu pre Hráča (Štatistiky)
+@router.get("/{match_id}/detail", name="match_detail_ui")
+async def match_detail_ui(
+    request: Request,
+    match_id: int,
+    svc: MatchesService = Depends(matches_service),
+    user: User = Depends(require_user), # Prístupné pre každého prihláseného
+):
+    match = svc.get_match(match_id)
+    if not match:
+        return RedirectResponse(url=request.url_for("matches_ui"))
+
+    # Použijeme metódu get_match_participants, ktorá vráti hráčov aj s hodnoteniami
+    participants = svc.get_match_participants(match_id)
+
+    return request.app.state.templates.TemplateResponse(
+        "match_detail.html",
+        {
+            "request": request,
+            "match": match,
+            "participants": participants,
+            "user": user
+        }
+    )

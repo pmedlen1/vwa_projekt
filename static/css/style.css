@@ -154,6 +154,10 @@ nav .nav-btn .material-symbols-outlined {
     color: var(--accent) !important;
 }
 
+.nav-link.is-active .nav-text{
+    color: var(--accent)
+}
+
 /* -------------------------------------------------
    5) INPUTS & FORM FIELDS
 --------------------------------------------------*/
