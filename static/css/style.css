@@ -9,6 +9,8 @@
 html, body {
     margin: 0;
     padding: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 /* -------------------------------------------------
@@ -57,6 +59,7 @@ nav {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    overflow: hidden;
 }
 
 @media (max-width: 576px) {
@@ -378,6 +381,7 @@ button,
 .table-card td {
     padding: 0.6rem 0.75rem;
     border-bottom: 1px solid #eee7de;
+    text-align: center;
 }
 
 .table-card th {
@@ -387,6 +391,7 @@ button,
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--accent-dark);
+
 }
 
 .table-card tr:last-child td {
@@ -653,11 +658,26 @@ button,
    15) SPECIAL
 --------------------------------------------------*/
 .gradient-card {
-    background: linear-gradient(120deg, #ff8fb5, #ffb074);
+    background: linear-gradient(120deg, #6b21a8, #68e9ff);
     color: #fff;
 }
 
 .gradient-card .chart-placeholder {
     background: rgba(255, 255, 255, 0.18);
     color: #fff;
+}
+
+/* -------------------------------------------------
+   Zarovnanie akčných tlačidiel v tabuľke
+--------------------------------------------------*/
+.table-card td > div {
+    /* Zarovná tlačidlá vodorovne na stred bunky */
+    justify-content: center;
+
+    /* Zarovná tlačidlá zvislo (aby boli v jednej rovine) */
+    align-items: center;
+
+    /* (Voliteľné) Ak by ste niekde zabudli inline style, toto to poistí: */
+    display: flex;
+    gap: 0.5rem;
 }

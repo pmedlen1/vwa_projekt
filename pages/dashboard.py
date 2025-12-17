@@ -1,13 +1,15 @@
 from datetime import datetime
 from typing import Optional
+import sqlite3  # <--- 1. Import sqlite3
+
 from fastapi import APIRouter, Depends, Request
-import sqlite3
-from starlette.responses import RedirectResponse
 from services.auth import User
 from services.matches import MatchesService
 from services.players import PlayersService
 from services.trainings import TrainingsService
+# 2. Pridané 'get_conn' do importov
 from dependencies import (get_current_user, matches_service, players_service, trainings_service, get_conn)
+# 3. Import funkcie na získanie dát
 from repositories.users import get_user_by_id
 
 router = APIRouter()
@@ -19,38 +21,34 @@ async def dashboard_ui(
     matches_svc: MatchesService = Depends(matches_service),
     players_svc: PlayersService = Depends(players_service),
     trainings_svc: TrainingsService = Depends(trainings_service),
-    conn: sqlite3.Connection = Depends(get_conn)
+    conn: sqlite3.Connection = Depends(get_conn)  # <--- 4. Pridané pripojenie k DB
 ):
-
+    # --- OPRAVA MENA: Načítame plné dáta z DB ---
     template_user = user
     if user:
         full_user_data = get_user_by_id(conn, user.id)
         if full_user_data:
-            template_user = full_user_data
+            template_user = full_user_data # Toto obsahuje first_name aj last_name
+    # --------------------------------------------
 
     data = {}
 
     if user:
         # ADMIN
         if user.role == 'admin':
-
             all_matches = matches_svc.get_all_matches()
             all_players = players_svc.get_all_players()
-
             data = {
                 "matches_count": len(all_matches),
                 "players_count": len(all_players),
                 "trainings_count": len(trainings_svc.get_all_trainings()),
-                "recent_matches": all_matches[:3] #
+                "recent_matches": all_matches[:3]
             }
 
         # TRÉNER
         elif user.role == 'coach':
-
             matches = matches_svc.get_all_matches()
             trainings = trainings_svc.get_all_trainings()
-
-
             now_str = datetime.now().strftime("%Y-%m-%dT%H:%M")
 
             future_matches = [m for m in matches if m['date'] >= now_str]
@@ -68,9 +66,7 @@ async def dashboard_ui(
 
         # HRÁČ
         elif user.role == 'player':
-
             events = players_svc.get_events_for_player(user.id)
-
             now_str = datetime.now().strftime("%Y-%m-%dT%H:%M")
 
             future_events = [e for e in events if e['date'] >= now_str]
@@ -85,7 +81,7 @@ async def dashboard_ui(
         "dashboard.html",
         {
             "request": request,
-            "user": user,
+            "user": template_user, # <--- 5. Posielame plné dáta (nie pôvodný 'user')
             "data": data
         }
     )
