@@ -134,6 +134,7 @@ nav .nav-btn:hover {
     border-radius: 50% !important;
     transform: translateY(0);
     box-shadow: 0 6px 18px rgba(12,15,25,0.12);
+    color: var(--accent) !important;
 }
 
 .nav-link.is-active:hover,
@@ -155,7 +156,7 @@ nav .nav-btn .material-symbols-outlined {
 }
 
 .nav-link.is-active .nav-text{
-    color: var(--accent)
+    color: var(--accent) !important;
 }
 
 /* -------------------------------------------------
