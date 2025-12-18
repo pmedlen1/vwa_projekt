@@ -29,7 +29,16 @@ def insert_match(
 
 # Vymazanie zápasu
 def delete_match(conn: sqlite3.Connection, match_id: int) -> None:
+    # 1. Najprv vymažeme účasť spojenú s týmto zápasom
+    conn.execute("DELETE FROM attendance WHERE match_id = ?", (match_id,))
+
+    # 2. Potom vymažeme hodnotenia spojené s týmto zápasom
+    # (Ak tabuľka evaluations existuje, pre istotu mažeme aj odtiaľ)
+    conn.execute("DELETE FROM evaluations WHERE match_id = ?", (match_id,))
+
+    # 3. Až nakoniec vymažeme samotný zápas
     conn.execute("DELETE FROM matches WHERE id = ?", (match_id,))
+
     conn.commit()
 
 #  Aktualizácia skóre (pre trénera)
