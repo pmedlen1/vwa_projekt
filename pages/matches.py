@@ -45,6 +45,22 @@ async def create_match_post(
     svc: MatchesService = Depends(matches_service),
     user: User = Depends(require_admin_or_coach), # Len admin (a tréner) môže pridať zápas
 ):
+    errors = []
+    if not opponent.strip():
+        errors.append("Názov súpera je povinný.")
+    if not location.strip():
+        errors.append("Miesto zápasu je povinné.")
+    if not date:
+        errors.append("Dátum je povinný.")
+
+    if errors:
+        matches_list = svc.get_all_matches()
+        return request.app.state.templates.TemplateResponse(
+            "matches.html",
+            {"request": request, "matches": matches_list, "user": user, "error": errors[0]},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     # Vytvoríme zápas
     svc.create_match(date=date, opponent=opponent, location=location)
 
@@ -78,6 +94,23 @@ async def edit_match_post(
     svc: MatchesService = Depends(matches_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    if not opponent.strip() or not location.strip():
+        match = svc.get_match(match_id)
+        return request.app.state.templates.TemplateResponse(
+            "edit_match.html",
+            {"request": request, "match": match, "user": user, "error": "Všetky textové polia sú povinné."},
+             status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    if (home_score is not None and home_score < 0) or (away_score is not None and away_score < 0):
+        match = svc.get_match(match_id)
+        return request.app.state.templates.TemplateResponse(
+            "edit_match.html",
+            {"request": request, "match": match, "user": user, "error": "Skóre nemôže byť záporné."},
+             status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     # Konverzia: Ak je string prázdny, nastavíme None. Inak prevedieme na int.
     h_score_int = int(home_score) if home_score and home_score.strip() else None
     a_score_int = int(away_score) if away_score and away_score.strip() else None
@@ -146,6 +179,13 @@ async def evaluate_player_post(
     svc: MatchesService = Depends(matches_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    if not (0 <= rating <= 10):
+        return RedirectResponse(
+            url=request.url_for("manage_match_ui", match_id=match_id) + "?error=ZleHodnotenie",
+            status_code=status.HTTP_303_SEE_OTHER
+        )
+
     svc.save_evaluation(match_id, player_id, user.id, rating, comment)
     # Presmerujeme späť na stránku správy zápasu
     return RedirectResponse(

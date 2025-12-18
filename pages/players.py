@@ -42,6 +42,20 @@ async def create_player_post(
     svc: PlayersService = Depends(players_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    errors = []
+    if not username.strip() or len(username) < 3:
+        errors.append("Username musí mať aspoň 3 znaky.")
+    if not first_name.strip() or not last_name.strip():
+        errors.append("Meno a priezvisko sú povinné.")
+
+    if errors:
+        return request.app.state.templates.TemplateResponse(
+            "edit_player.html",
+            {"request": request, "player": None, "user": user, "errors": errors[0]}, # edit_player očakáva 'errors'
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     try:
         svc.create_player(username, first_name, last_name, position, birth_date)
         return RedirectResponse(url=request.url_for("players_ui"), status_code=status.HTTP_303_SEE_OTHER)
@@ -79,6 +93,16 @@ async def edit_player_post(
     svc: PlayersService = Depends(players_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    if not first_name.strip() or not last_name.strip():
+        # Načítame pôvodné dáta pre zobrazenie formulára
+        player = svc.get_player_by_id(player_id)
+        return request.app.state.templates.TemplateResponse(
+            "edit_player.html",
+            {"request": request, "player": player, "user": user, "errors": "Meno a priezvisko nesmú byť prázdne."},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     try:
         svc.update_player_info(player_id, first_name, last_name, position, birth_date)
         return RedirectResponse(url=request.url_for("players_ui"), status_code=status.HTTP_303_SEE_OTHER)

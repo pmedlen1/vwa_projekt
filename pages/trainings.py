@@ -43,6 +43,20 @@ async def create_training_post(
     svc: TrainingsService = Depends(trainings_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    if not location.strip() or not date:
+        trainings_list = svc.get_all_trainings()
+        return request.app.state.templates.TemplateResponse(
+            "trainings.html",
+            {
+                "request": request,
+                "trainings": trainings_list,
+                "user": user,
+                "error": "Dátum a miesto sú povinné údaje."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     svc.create_training(date, location, description)
     return RedirectResponse(url=request.url_for("trainings_ui"), status_code=status.HTTP_303_SEE_OTHER)
 
@@ -74,6 +88,20 @@ async def edit_training_post(
     svc: TrainingsService = Depends(trainings_service),
     user: User = Depends(require_admin_or_coach),
 ):
+
+    if not location.strip():
+        training = svc.get_training(training_id)
+        return request.app.state.templates.TemplateResponse(
+            "edit_training.html",
+            {
+                "request": request,
+                "training": training,
+                "user": user,
+                "error": "Miesto tréningu nesmie byť prázdne."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     svc.edit_training(training_id, date, location, description)
     return RedirectResponse(url=request.url_for("trainings_ui"), status_code=status.HTTP_303_SEE_OTHER)
 
