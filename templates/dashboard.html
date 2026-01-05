@@ -32,12 +32,12 @@
           <div class="card__value">{{ data.players_count }}</div>
           <small>Aktívna súpiska</small>
       </div>
-      <div class="card mini-card">
+      <div class="card mini-card gradient-card">
           <span class="card__label">Všetky zápasy</span>
           <div class="card__value">{{ data.matches_count }}</div>
           <a href="{{ url_for('matches_ui') }}" style="font-size:0.8rem; color: var(--accent);">Spravovať zápasy &rarr;</a>
       </div>
-      <div class="card mini-card">
+      <div class="card mini-card gradient-card">
           <span class="card__label">Tréningy</span>
           <div class="card__value">{{ data.trainings_count }}</div>
           <a href="{{ url_for('trainings_ui') }}" style="font-size:0.8rem; color: var(--accent);">Rozpis tréningov &rarr;</a>
@@ -59,16 +59,16 @@
           <h3 style="margin-bottom:0.5rem;">Čo ťa čaká</h3>
 
           <div class="dashboard__row">
-              <div class="card stack-md" style="flex:1;">
-                  <span class="card__label" style="color:var(--accent);">Najbližší zápas</span>
+              <div class="card mini-card gradient-card" style="flex:1;">
+                  <span class="card__label" style="">Najbližší zápas</span>
                   {% if data.next_match %}
                     <div>
                         <div class="card__value" style="font-size:1.5rem; margin-bottom:0.2rem;">{{ data.next_match.opponent }}</div>
-                        <div style="color:var(--muted); font-size:0.9rem;">
+                        <div style="font-size:0.9rem;">
                             <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:text-bottom;">calendar_today</span>
                             {{ data.next_match.date.replace('T', ' ') }}
                         </div>
-                        <div style="color:var(--muted); font-size:0.9rem;">
+                        <div style=" font-size:0.9rem;">
                              <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:text-bottom;">location_on</span>
                              {{ data.next_match.location }}
                         </div>
@@ -77,21 +77,21 @@
                         <a href="{{ url_for('manage_match_ui', match_id=data.next_match.id) }}" class="button" style="font-size:0.8rem;">Spravovať súpisku</a>
                     </div>
                   {% else %}
-                    <p style="color:var(--muted);">Žiadne naplánované zápasy.</p>
+                    <p style="">Žiadne naplánované zápasy.</p>
                     <a href="{{ url_for('matches_ui') }}" class="button">Naplánovať zápas</a>
                   {% endif %}
               </div>
 
-              <div class="card stack-md" style="flex:1;">
-                  <span class="card__label" style="color:#2563eb;">Najbližší tréning</span>
+              <div class="card mini-card gradient-card" style="flex:1;">
+                  <span class="card__label">Najbližší tréning</span>
                   {% if data.next_training %}
                     <div>
                         <div class="card__value" style="font-size:1.5rem; margin-bottom:0.2rem;">{{ data.next_training.location }}</div>
-                        <div style="color:var(--muted); font-size:0.9rem;">
+                        <div style=" font-size:0.9rem;">
                             {{ data.next_training.date.replace('T', ' ') }}
                         </div>
                         {% if data.next_training.description %}
-                        <p style="font-size:0.85rem; color:#555; margin-top:0.5rem;">{{ data.next_training.description }}</p>
+                        <p style="font-size:0.85rem; margin-top:0.5rem;">{{ data.next_training.description }}</p>
                         {% endif %}
                     </div>
                   {% else %}
