@@ -692,6 +692,10 @@ button,
     gap: 0.5rem;
 }
 
+.mobile-logout-form {
+    display: none;
+}
+
 /* -------------------------------------------------
    16) MOBILE RESPONSIVENESS
 --------------------------------------------------*/
@@ -790,10 +794,47 @@ button,
         align-items: center;
     }
 
-
-
-    /* 5. Väčšie tlačidlá pre dotyk */
-    .button, button, .nav-btn {
-        min-height: 44px; /* Minimálna výška pre dotykové ovládanie */
+    .table-card tr:last-child td {
+        border-bottom: 1px solid #eee;
     }
+
+    .table-card td:last-child {
+        border-bottom: none;
+    }
+
+    .table-card tr td:last-child {
+        border-bottom: none;
+    }
+
+    /* Väčšie tlačidlá pre dotyk */
+    .button, button, .nav-btn {
+        min-height: 44px;
+    }
+
+    /* tlačidlo odhlásenia na mobile */
+    .mobile-logout-form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+
+    .mobile-logout-btn {
+        background: transparent !important;
+        border: none;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .mobile-logout-btn .material-symbols-outlined {
+        font-size: 28px;
+        color: #ffffff !important;
+    }
+
 }

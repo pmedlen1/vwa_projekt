@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta name="theme-color" content="#1f2333">
 </head>
 <body>
 
@@ -55,6 +56,12 @@
                  arial-label="Trénigy">
                 <span class="material-symbols-outlined">sprint</span>
             </a>
+
+             <form method="post" action="{{ url_for('logout') }}" class="mobile-logout-form">
+                <button type="submit" class="nav-link mobile-logout-btn" title="Odhlásit" aria-label="Odhlásit">
+                    <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                </button>
+             </form>
         </div>
 
         <div class="nav-footer">
